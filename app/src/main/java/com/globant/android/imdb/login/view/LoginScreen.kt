@@ -65,7 +65,6 @@ fun LoginScreen(navController:NavController?, modifier:Modifier = Modifier) {
                             unfocusedIndicatorColor = Color.Transparent,
                             disabledIndicatorColor = Color.Transparent
                         )
-
                     )
                     TextField(
                         value = "",
@@ -79,7 +78,6 @@ fun LoginScreen(navController:NavController?, modifier:Modifier = Modifier) {
                             unfocusedIndicatorColor = Color.Transparent,
                             disabledIndicatorColor = Color.Transparent
                         )
-
                     )
                 }
             }

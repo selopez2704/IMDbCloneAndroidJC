@@ -1,9 +1,7 @@
 package com.globant.android.imdb.utils
 
-import android.provider.CalendarContract
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -55,7 +53,7 @@ fun TopBar(enabled:Boolean = true, route:String = "home-screen", navController:N
             Row(modifier = Modifier
                 .height(40.dp)
                 .fillMaxWidth()
-                .background(color = Color.Red)
+                .background(color = Color.White)
             ) {
                 IconButton(onClick = { navController.navigate(route) }) {
                     Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Volver")
