@@ -94,7 +94,7 @@ fun BottonBar(enabled:Boolean = true, navController:NavController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(onClick = { "a" }) {
+                IconButton(onClick = { navController.navigate(AppScreens.SearchScreen.route) }) {
                     Icon(
                         imageVector = Icons.Filled.Search,
                         modifier = Modifier.size(24.dp),

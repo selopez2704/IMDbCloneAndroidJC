@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.globant.android.imdb.login.view.LoginScreen
 import com.globant.android.imdb.home.view.HomeScreen
+import com.globant.android.imdb.search.view.SearchScreen
 import com.globant.android.imdb.signup.view.SignUpScreen
 
 @Composable
@@ -20,6 +21,9 @@ fun AppNavigation(){
         }
         composable(route = AppScreens.SignUpScreen.route){
             SignUpScreen(navController)
+        }
+        composable(route = AppScreens.SearchScreen.route){
+            SearchScreen(navController)
         }
     }
 }
