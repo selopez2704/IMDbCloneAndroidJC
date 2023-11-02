@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,12 +18,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,15 +44,17 @@ import com.globant.android.imdb.R
 import com.globant.android.imdb.home.viewmodel.Card
 import com.globant.android.imdb.home.viewmodel.FeatureContent
 import com.globant.android.imdb.home.viewmodel.HomeScreenViewModel
+import com.globant.android.imdb.home.viewmodel.HomeScreenViewModelFactory
+import com.globant.android.imdb.repository.MoviesRepository
 
 
 @Composable
-fun HomeScreen(navController:NavController, homeScreenViewModel:HomeScreenViewModel = viewModel()) {
-
-    val featureContentState by homeScreenViewModel.featureContentUIState.collectAsState()
-    val bestChoicesCarouselState by homeScreenViewModel.bestChoicesCarouselUIState.collectAsState()
-    val fanFavoritesCarouselState by homeScreenViewModel.fanFavoritesCarouselUIState.collectAsState()
-    val mayInterestState by homeScreenViewModel.mayInterestUIState.collectAsState()
+fun HomeScreen(navController:NavController, repository:MoviesRepository) {
+    val homeScreenViewModel: HomeScreenViewModel = viewModel(factory = HomeScreenViewModelFactory(repository))
+    val featureContentState = homeScreenViewModel.featureContentUIState.collectAsState().value
+    val bestChoicesCarouselState = homeScreenViewModel.bestChoicesCarouselUIState.collectAsState().value
+    val fanFavoritesCarouselState = homeScreenViewModel.fanFavoritesCarouselUIState.collectAsState().value
+    val mayInterestState = homeScreenViewModel.mayInterestUIState.collectAsState().value
 
     TopBottomBar(
         topEnabled = false,

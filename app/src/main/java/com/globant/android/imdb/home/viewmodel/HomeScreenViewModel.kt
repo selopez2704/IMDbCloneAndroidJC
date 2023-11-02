@@ -1,12 +1,19 @@
 package com.globant.android.imdb.home.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.globant.android.imdb.repository.MoviesRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class HomeScreenViewModel : ViewModel() {
-    private val _featureContentUIState = MutableStateFlow(FeatureContent("Player","Poster","Title", "Subtitle"))
+class HomeScreenViewModel(val moviesRepository:MoviesRepository) : ViewModel() {
+    private val _featureContentUIState =
+        MutableStateFlow(FeatureContent("Player", "Poster", "Title", "Subtitle"))
     val featureContentUIState:StateFlow<FeatureContent> = _featureContentUIState.asStateFlow()
 
     private val _bestChoicesCarouselUIState =
@@ -20,18 +27,29 @@ class HomeScreenViewModel : ViewModel() {
     private val _mayInterestUIState =
         MutableStateFlow(Carousel("Quizás te interesen", defaultCarouselCards))
     val mayInterestUIState:StateFlow<Carousel> = _mayInterestUIState.asStateFlow()
+
+    init {
+        updateMovies()
+    }
+
+
+    private fun updateMovies() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val movies = moviesRepository.listPopularMovies()
+            withContext(Dispatchers.Main) {
+                _bestChoicesCarouselUIState.value.cards =
+                    movies.take(10).map { Card(it.title, it.title, it.title, it.title) }
+            }
+        }
+    }
 }
 
 data class FeatureContent(
-    val player:String = "",
-    val poster:String = "",
-    val title:String = "",
-    val subTitle:String = ""
+    val player:String = "", val poster:String = "", val title:String = "", val subTitle:String = ""
 )
 
 data class Carousel(
-    val name:String = "",
-    val cards:List<Card>
+    val name:String = "", var cards:List<Card>
 )
 
 data class Card(
