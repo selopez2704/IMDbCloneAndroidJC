@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,8 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,21 +46,23 @@ import com.globant.android.imdb.R
 import com.globant.android.imdb.home.viewmodel.Card
 import com.globant.android.imdb.home.viewmodel.FeatureContent
 import com.globant.android.imdb.home.viewmodel.HomeScreenViewModel
+import com.globant.android.imdb.home.viewmodel.HomeScreenViewModelFactory
+import com.globant.android.imdb.repository.MoviesRepository
 
 
 @Composable
-fun HomeScreen(navController:NavController, homeScreenViewModel:HomeScreenViewModel = viewModel()) {
-
-    val featureContentState by homeScreenViewModel.featureContentUIState.collectAsState()
-    val bestChoicesCarouselState by homeScreenViewModel.bestChoicesCarouselUIState.collectAsState()
-    val fanFavoritesCarouselState by homeScreenViewModel.fanFavoritesCarouselUIState.collectAsState()
-    val mayInterestState by homeScreenViewModel.mayInterestUIState.collectAsState()
+fun HomeScreen(navController:NavController, repository:MoviesRepository) {
+    val homeScreenViewModel:HomeScreenViewModel =
+        viewModel(factory = HomeScreenViewModelFactory(repository))
+    val featureContentState = homeScreenViewModel.state.collectAsState().value.featureContent
+    val bestChoicesCarouselState =
+        homeScreenViewModel.state.collectAsState().value.bestChoicesCarousel
+    val fanFavoritesCarouselState =
+        homeScreenViewModel.state.collectAsState().value.fanFavoritesCarousel
+    val mayInterestState = homeScreenViewModel.state.collectAsState().value.mayInterest
 
     TopBottomBar(
-        topEnabled = false,
-        bottomEnabled = true,
-        topBackRoute = "home-screen",
-        navController
+        topEnabled = false, bottomEnabled = true, topBackRoute = "home-screen", navController
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -74,21 +75,28 @@ fun HomeScreen(navController:NavController, homeScreenViewModel:HomeScreenViewMo
                 FeatureContent(featureContentState)
             }
             item {
+                Button(modifier = Modifier
+                    .height(64.dp)
+                    .padding(start = 64.dp, end = 64.dp)
+                    .fillMaxWidth(),
+                       shape = RoundedCornerShape(16.dp),
+                       onClick = { homeScreenViewModel.updateEntireScreenState() }) {
+                    Text(text = "Actualizar estado")
+                }
+            }
+            item {
                 Carousel(
-                    title = bestChoicesCarouselState.name,
-                    movies = bestChoicesCarouselState.cards
+                    title = bestChoicesCarouselState.name, movies = bestChoicesCarouselState.cards
                 )
             }
             item {
                 Carousel(
-                    title = mayInterestState.name,
-                    movies = mayInterestState.cards
+                    title = mayInterestState.name, movies = mayInterestState.cards
                 )
             }
             item {
                 Carousel(
-                    title = fanFavoritesCarouselState.name,
-                    movies = fanFavoritesCarouselState.cards
+                    title = fanFavoritesCarouselState.name, movies = fanFavoritesCarouselState.cards
                 )
             }
 
@@ -143,13 +151,9 @@ fun FeatureContent(featureContentState:FeatureContent) {
 @Preview
 @Composable
 fun Carousel(
-    title:String = "Not defined",
-    movies:List<Card> = listOf<Card>(
+    title:String = "Not defined", movies:List<Card> = listOf<Card>(
         Card(
-            "undefined",
-            "undefined",
-            "undefined",
-            "undefined"
+            "undefined", "undefined", "undefined", "undefined"
         )
     )
 ) {
@@ -162,18 +166,15 @@ fun Carousel(
     ) {
         Row(modifier = Modifier.height(32.dp), verticalAlignment = Alignment.CenterVertically) {
             Divider(
-                color = Color.Transparent,
-                modifier = Modifier
+                color = Color.Transparent, modifier = Modifier
                     .height(24.dp)  //fill the max height
                     .width(4.dp)
                     .border(
-                        shape = RoundedCornerShape(12.dp),
-                        width = 12.dp,
-                        color = Color.Red
+                        shape = RoundedCornerShape(12.dp), width = 12.dp, color = Color.Red
 //                        color = MaterialTheme.colorScheme.surface
                     )
             )
-            Text(text = title, modifier = Modifier.padding(start=12.dp))
+            Text(text = title, modifier = Modifier.padding(start = 12.dp))
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
             items(movies) { movie -> CardUI(movie) }
@@ -184,10 +185,7 @@ fun Carousel(
 @Composable
 fun CardUI(
     card:Card = Card(
-        "undefined",
-        "undefined",
-        "undefined",
-        "undefined"
+        "undefined", "undefined", "undefined", "undefined"
     )
 ) {
 
@@ -206,8 +204,7 @@ fun CardUI(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(shape = RoundedCornerShape(bottomStart = 2.dp, bottomEnd = 2.dp))
-        )
-        {
+        ) {
             ConstraintLayout(
                 Modifier
                     .fillMaxSize()
@@ -229,41 +226,41 @@ fun CardUI(
                         modifier = Modifier.fillMaxSize()
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .constrainAs(cardText) {
-                            top.linkTo(cardImage.bottom)
-                        }
-                ) {
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp)
+                    .constrainAs(cardText) {
+                        top.linkTo(cardImage.bottom)
+                    }) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(start = 12.dp, top = 12.dp)
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically){
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 painter = painterResource(R.drawable.rating_icon),
                                 contentDescription = "Rating Icon",
-                                modifier=Modifier.size(16.dp)
+                                modifier = Modifier.size(16.dp)
                             )
-                            Text(text = card.rating, fontSize = 11.sp,modifier=Modifier.padding(start=4.dp))
+                            Text(
+                                text = card.rating,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
                         }
-                        Row(){
+                        Row() {
                             Text(text = card.name, fontSize = 15.sp)
                         }
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .background(color = Color.Black.copy(alpha = 0.6f))
-                        .constrainAs(cardPlusButton) {
-                            top.linkTo(parent.top)
-                            start.linkTo(startGuide)
-                        }
-                ) {
+                Box(modifier = Modifier
+                    .size(24.dp)
+                    .background(color = Color.Black.copy(alpha = 0.6f))
+                    .constrainAs(cardPlusButton) {
+                        top.linkTo(parent.top)
+                        start.linkTo(startGuide)
+                    }) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -272,15 +269,13 @@ fun CardUI(
                         )
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .constrainAs(cardInfoButton) {
-                            end.linkTo(parent.end, margin = 6.dp)
-                            bottom.linkTo(parent.bottom, margin = 6.dp)
-                        }
-                ) {
-                    IconButton(onClick = { card.moreInfoButton}) {
+                Box(modifier = Modifier
+                    .size(24.dp)
+                    .constrainAs(cardInfoButton) {
+                        end.linkTo(parent.end, margin = 6.dp)
+                        bottom.linkTo(parent.bottom, margin = 6.dp)
+                    }) {
+                    IconButton(onClick = { card.moreInfoButton }) {
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = "Get info",
