@@ -7,8 +7,18 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface RetrofitService {
-    @GET("discover/movie?sort_by=popularity.desc")
+    @GET("movie/popular")
     suspend fun listPopularMovies(
+        @Query("api_key") apiKey:String,
+        @Query("region") region:String,
+    ): MoviesResult
+    @GET("discover/movie?sort_by=popularity.desc")
+    suspend fun listMoviesByPopularity(
+        @Query("api_key") apiKey:String,
+        @Query("region") region:String,
+    ): MoviesResult
+    @GET("movie/top_rated")
+    suspend fun listTopRatedMovies(
         @Query("api_key") apiKey:String,
         @Query("region") region:String,
     ): MoviesResult
